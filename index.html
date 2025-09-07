@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Course Materials</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 1rem;
+    }
+    h1 {
+      text-align: center;
+    }
+    .week {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+    .week-header {
+      background: #f0f0f0;
+      padding: 10px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .week-content {
+      display: none;
+      padding: 10px;
+    }
+    .week-content a {
+      display: block;
+      margin: 5px 0;
+      text-decoration: none;
+      color: #0066cc;
+    }
+  </style>
+</head>
+<body>
+  <h1>Course Materials</h1>
+
+  <div class="week">
+    <div class="week-header">Week 1</div>
+    <div class="week-content">
+      <a href="week1/lecture1.pdf" target="_blank">Lecture 1 Slides</a>
+      <a href="week1/reading.pdf" target="_blank">Reading</a>
+      <a href="week1/video.mp4" target="_blank">Recorded Lecture</a>
+    </div>
+  </div>
+
+  <div class="week">
+    <div class="week-header">Week 2</div>
+    <div class="week-content">
+      <a href="week2/lecture2.pdf" target="_blank">Lecture 2 Slides</a>
+      <a href="week2/assignment1.pdf" target="_blank">Assignment 1</a>
+    </div>
+  </div>
+
+  <script>
+    // Toggle content visibility when clicking on a week
+    document.querySelectorAll(".week-header").forEach(header => {
+      header.addEventListener("click", () => {
+        const content = header.nextElementSibling;
+        content.style.display = (content.style.display === "block") ? "none" : "block";
+      });
+    });
+  </script>
+</body>
+</html>
