@@ -7,59 +7,84 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      max-width: 800px;
+      max-width: 900px;
       margin: 2rem auto;
       padding: 1rem;
+      background: #fafafa;
     }
     h1 {
       text-align: center;
+      margin-bottom: 1.5rem;
     }
     .week {
       border: 1px solid #ddd;
       border-radius: 8px;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
       overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
     .week-header {
       background: #f0f0f0;
-      padding: 10px;
+      padding: 12px;
       cursor: pointer;
       font-weight: bold;
+      transition: background 0.2s ease;
+    }
+    .week-header:hover {
+      background: #e0e0e0;
     }
     .week-content {
       display: none;
-      padding: 10px;
+      padding: 10px 15px;
+      background: #fff;
     }
     .week-content a {
       display: block;
-      margin: 5px 0;
+      margin: 6px 0;
       text-decoration: none;
       color: #0066cc;
+    }
+    .week-content a:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
   <h1>Course Materials</h1>
 
-  <div class="week">
-    <div class="week-header">Week 1</div>
-    <div class="week-content">
-      <a href="week1/lecture1.pdf" target="_blank">Lecture 1 Slides</a>
-      <a href="week1/reading.pdf" target="_blank">Reading</a>
-      <a href="week1/video.mp4" target="_blank">Recorded Lecture</a>
-    </div>
-  </div>
-
-  <div class="week">
-    <div class="week-header">Week 2</div>
-    <div class="week-content">
-      <a href="week2/lecture2.pdf" target="_blank">Lecture 2 Slides</a>
-      <a href="week2/assignment1.pdf" target="_blank">Assignment 1</a>
-    </div>
+  <!-- Weeks 1–16 -->
+  <div id="weeks-container">
+    <!-- JS will generate weeks here -->
   </div>
 
   <script>
-    // Toggle content visibility when clicking on a week
+    const container = document.getElementById("weeks-container");
+
+    // Generate 16 weeks
+    for (let i = 1; i <= 16; i++) {
+      const weekDiv = document.createElement("div");
+      weekDiv.className = "week";
+
+      // Week header
+      const header = document.createElement("div");
+      header.className = "week-header";
+      header.textContent = `Week ${i}`;
+
+      // Week content (placeholders for links)
+      const content = document.createElement("div");
+      content.className = "week-content";
+      content.innerHTML = `
+        <a href="week${i}/lecture${i}.pdf" target="_blank">Lecture ${i} Slides</a>
+        <a href="week${i}/reading${i}.pdf" target="_blank">Reading Material</a>
+        <a href="week${i}/assignment${i}.pdf" target="_blank">Assignment ${i}</a>
+      `;
+
+      weekDiv.appendChild(header);
+      weekDiv.appendChild(content);
+      container.appendChild(weekDiv);
+    }
+
+    // Toggle open/close on click
     document.querySelectorAll(".week-header").forEach(header => {
       header.addEventListener("click", () => {
         const content = header.nextElementSibling;
