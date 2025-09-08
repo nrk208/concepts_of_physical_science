@@ -1,1 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shareable Physics Flashcards</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // MathJax Configuration for rendering LaTeX
+        window.MathJax = {
+          tex: {
+            inlineMath: [['$', '$'], ['\\(', '\\)']],
+            displayMath: [['$$', '$$'], ['\\[', '\\]']]
+          },
+          svg: {
+            fontCache: 'global'
+          }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        /* Custom styles for the 3D card flip animation */
+        .perspective-container {
+            perspective: 1000px;
+        }
+        .card {
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+        }
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+        .card-face {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden; /* Safari */
+        }
+        .card-back {
+            transform: rotateY(180deg);
+        }
+        /* Custom scrollbar for better aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #2d3748;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4a5568;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #718096;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white font-sans flex flex-col items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-2xl text-center">
+        <h1 class="text-3xl md:text-4xl font-bold mb-2 text-cyan-400">Physics: Mechanics Flashcards</h1>
+        <p class="text-gray-400 mb-6">Click the card to flip it. Use the buttons to navigate.</p>
+    </div>
+
+    <!-- Container for the 3D perspective effect -->
+    <div class="perspective-container w-full max-w-2xl h-80 md:h-96 mb-6">
+        <!-- The card element that will be flipped -->
+        <div id="flashcard" class="card relative w-full h-full cursor-pointer">
+            <!-- Front of the card -->
+            <div class="card-face card-front absolute w-full h-full bg-gray-800 rounded-lg shadow-2xl flex items-center justify-center p-6 text-center">
+                <p id="card-front-text" class="text-2xl md:text-3xl font-semibold"></p>
+            </div>
+            <!-- Back of the card -->
+            <div class="card-face card-back absolute w-full h-full bg-cyan-800 rounded-lg shadow-2xl flex items-center justify-center p-6 text-center">
+                <div class="overflow-y-auto max-h-full">
+                   <p id="card-back-text" class="text-lg md:text-xl"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation controls -->
+    <div class="flex items-center justify-center w-full max-w-2xl space-x-4">
+        <button id="prev-btn" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-300">
+            &larr; Previous
+        </button>
+        <div id="progress-indicator" class="text-lg font-medium text-gray-400 w-24 text-center">1 / 25</div>
+        <button id="next-btn" class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-300">
+            Next &rarr;
+        </button>
+    </div>
+
+    <script>
+        const flashcards = [
+            { front: "Newton's Law of Universal Gravitation", back: "The gravitational force between any two masses ($m_{1}$ and $m_{2}$) is directly proportional to the product of their masses and inversely proportional to the square of the distance ($d$) between their centers." },
+            { front: "The formula for gravitational force.", back: "$$F_{g}=G\\frac{m_{1}m_{2}}{d^{2}}$$ <br>where $F_{g}$ is gravitational force, G is the Universal Gravitational Constant, $m_{1}$ and $m_{2}$ are the masses, and $d$ is the distance between their centers." },
+            { front: "What happens to the gravitational force between two objects if the distance between them is tripled?", back: "The force is reduced to one-ninth of the original force. Because the force is inversely proportional to the square of the distance ($d^{2}$)." },
+            { front: "Momentum", back: "A measure of an object's motion, defined by its mass and velocity. It is a vector quantity." },
+            { front: "The formula for momentum.", back: "$$P = mv$$ <br>where $P$ is momentum, $m$ is mass, and $v$ is velocity." },
+            { front: "The principle of conservation of momentum.", back: "The total momentum of a group of interacting objects remains the same in the absence of external forces." },
+            { front: "What makes an object with a small mass hard to stop?", back: "A small object can have a large momentum if it has a very high velocity. Both mass and velocity contribute to momentum." },
+            { front: "Work done on an object.", back: "The product of the applied force and the parallel distance through which the force acts." },
+            { front: "The formula for work.", back: "$$W = Fd$$ <br>where $W$ is work, $F$ is the force parallel to the motion, and $d$ is the distance the object moves." },
+            { front: "The definition of negative work.", back: "Work done by a force that acts in the opposite direction of the object's motion, such as friction." },
+            { front: "Kinetic Energy", back: "The energy an object possesses due to its motion." },
+            { front: "The formula for kinetic energy.", back: "$$KE=\\frac{1}{2}mv^{2}$$ <br>where $KE$ is kinetic energy, $m$ is mass, and $v$ is velocity." },
+            { front: "The Work-Energy Theorem.", back: "The work done on an object is equal to the change in its kinetic energy, or $W = \\Delta KE$." },
+            { front: "Potential Energy", back: "Stored energy an object has due to its position or condition." },
+            { front: "The formula for gravitational potential energy.", back: "$$PE = mgh$$ <br>where $PE$ is potential energy, $m$ is mass, $g$ is the acceleration due to gravity, and $h$ is height." },
+            { front: "The principle of conservation of energy.", back: "Energy cannot be created or destroyed, only converted from one form to another. The total energy of a closed system remains constant." },
+            { front: "What are some real-world applications of impulse?", back: "Airbags in cars, padded helmets, and knee pads. They increase the time of the collision to decrease the force and prevent injury." },
+            { front: "The Impulse-Momentum Theorem.", back: "The impulse on an object is equal to the change in its momentum. <br>$$Ft = \\Delta P$$" },
+            { front: "Why do we not feel the gravitational force between everyday objects?", back: "Because the gravitational force between objects with small masses is extremely small, on the order of ten-millionths of a Newton." },
+            { front: "Is momentum a scalar or vector quantity?", back: "Momentum is a vector quantity, meaning it has both magnitude and direction." },
+            { front: "When is the total momentum of a system of colliding objects conserved?", back: "Momentum is conserved when there are no external forces acting on the system." },
+            { front: "What is the unit of work and energy?", back: "The Joule (J), which is equivalent to a Newton-meter (N·m)." },
+            { front: "A person stands still holding a box. Is work being done on the box?", back: "No. Work requires a force to cause a displacement. Since the box is not moving, no work is being done." },
+            { front: "How is acceleration due to gravity ($g$) related to the Law of Universal Gravitation?", back: "Acceleration due to gravity is the constant value $\\{G\\frac{M}{d^{2}}\\}$, where G is the gravitational constant, M is the mass of the planet, and d is the distance from its center." },
+            { front: "What is the relationship between the weight of an object and the force of gravity?", back: "The weight of an object is the force of gravity on that object, often calculated as $F=mg$." }
+        ];
+
+        // DOM element references
+        const flashcard = document.getElementById('flashcard');
+        const cardFrontText = document.getElementById('card-front-text');
+        const cardBackText = document.getElementById('card-back-text');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const progressIndicator = document.getElementById('progress-indicator');
+        
+        let currentCardIndex = 0;
+
+        // Function to update the card content
+        function updateCard() {
+            const card = flashcards[currentCardIndex];
+            cardFrontText.innerHTML = card.front;
+            cardBackText.innerHTML = card.back;
+            progressIndicator.textContent = `${currentCardIndex + 1} / ${flashcards.length}`;
+            // Re-render LaTeX content if MathJax is available
+            if (window.MathJax) {
+                MathJax.typesetPromise();
+            }
+        }
+
+        // Event listener for flipping the card
+        flashcard.addEventListener('click', () => {
+            flashcard.classList.toggle('flipped');
+        });
+
+        // Event listener for the "Next" button
+        nextBtn.addEventListener('click', () => {
+            currentCardIndex = (currentCardIndex + 1) % flashcards.length;
+            flashcard.classList.remove('flipped');
+            // A small delay to allow the card to flip back before changing content
+            setTimeout(updateCard, 150); 
+        });
+
+        // Event listener for the "Previous" button
+        prevBtn.addEventListener('click', () => {
+            currentCardIndex = (currentCardIndex - 1 + flashcards.length) % flashcards.length;
+            flashcard.classList.remove('flipped');
+            setTimeout(updateCard, 150);
+        });
+
+        // Initialize the first card
+        updateCard();
+    </script>
+
+</body>
+</html>
 
